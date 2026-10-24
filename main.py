@@ -7,6 +7,7 @@ from screens.dashboard import DashboardScreen
 from screens.inventory import InventoryScreen
 from screens.sales import SalesScreen
 from screens.expenses import ExpensesScreen
+from screens.reports import ReportsScreen
 
 from database.db import initialize_database
 
@@ -54,6 +55,14 @@ class KhulaApp(App):
         expenses_page.add_widget(self.expenses_screen)
         self.manager.add_widget(expenses_page)
 
+        # Financial Reports
+        reports_page = Screen(name="reports")
+        self.reports_screen = ReportsScreen(
+            go_back=self.show_dashboard
+        )
+        reports_page.add_widget(self.reports_screen)
+        self.manager.add_widget(reports_page)
+
         # Connect dashboard buttons
         self.dashboard.handle_action = self.handle_action
 
@@ -74,6 +83,10 @@ class KhulaApp(App):
         elif button.text == "Add Expense":
             self.expenses_screen.refresh_data()
             self.manager.current = "expenses"
+
+        elif button.text == "View Reports":
+            self.reports_screen.refresh_report()
+            self.manager.current = "reports"
 
         else:
             print(f"Selected: {button.text}")
