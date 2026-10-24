@@ -5,6 +5,8 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 
+from services.reports_service import get_financial_report
+
 
 class DashboardScreen(BoxLayout):
 
@@ -13,6 +15,9 @@ class DashboardScreen(BoxLayout):
             orientation="vertical",
             **kwargs
         )
+
+        # Store references to the statistic labels
+        self.stat_labels = {}
 
         scroll = ScrollView()
 
@@ -27,6 +32,7 @@ class DashboardScreen(BoxLayout):
             minimum_height=content.setter("height")
         )
 
+        # Application title
         title = Label(
             text="KHULA",
             font_size=34,
@@ -38,6 +44,7 @@ class DashboardScreen(BoxLayout):
 
         content.add_widget(title)
 
+        # Dashboard subtitle
         subtitle = Label(
             text="Business Overview",
             font_size=22,
@@ -48,6 +55,7 @@ class DashboardScreen(BoxLayout):
 
         content.add_widget(subtitle)
 
+        # Statistics grid
         stats = GridLayout(
             cols=2,
             spacing=10,
@@ -58,7 +66,7 @@ class DashboardScreen(BoxLayout):
         statistics = [
             ("Total Sales", "R 0.00"),
             ("Expenses", "R 0.00"),
-            ("Estimated Profit", "R 0.00"),
+            ("Estimated Balance", "R 0.00"),
             ("Products", "0")
         ]
 
@@ -69,26 +77,29 @@ class DashboardScreen(BoxLayout):
                 padding=10
             )
 
-            card.add_widget(
-                Label(
-                    text=name,
-                    font_size=14
-                )
+            name_label = Label(
+                text=name,
+                font_size=14
             )
 
-            card.add_widget(
-                Label(
-                    text=value,
-                    font_size=22,
-                    bold=True,
-                    color=(0.25, 0.85, 0.50, 1)
-                )
+            value_label = Label(
+                text=value,
+                font_size=22,
+                bold=True,
+                color=(0.25, 0.85, 0.50, 1)
             )
+
+            # Save reference for live updates
+            self.stat_labels[name] = value_label
+
+            card.add_widget(name_label)
+            card.add_widget(value_label)
 
             stats.add_widget(card)
 
         content.add_widget(stats)
 
+        # Quick Actions heading
         actions_title = Label(
             text="Quick Actions",
             font_size=22,
@@ -99,6 +110,7 @@ class DashboardScreen(BoxLayout):
 
         content.add_widget(actions_title)
 
+        # Quick Actions buttons
         actions = GridLayout(
             cols=2,
             spacing=10,
@@ -132,6 +144,30 @@ class DashboardScreen(BoxLayout):
 
         scroll.add_widget(content)
         self.add_widget(scroll)
+
+        # Load current database statistics
+        self.refresh_statistics()
+
+    def refresh_statistics(self):
+        """Refresh dashboard figures from SQLite."""
+
+        report = get_financial_report()
+
+        self.stat_labels["Total Sales"].text = (
+            f"R {report['total_sales']:.2f}"
+        )
+
+        self.stat_labels["Expenses"].text = (
+            f"R {report['total_expenses']:.2f}"
+        )
+
+        self.stat_labels["Estimated Balance"].text = (
+            f"R {report['estimated_balance']:.2f}"
+        )
+
+        self.stat_labels["Products"].text = (
+            str(report["product_count"])
+        )
 
     def handle_action(self, button):
         print(f"Selected: {button.text}")

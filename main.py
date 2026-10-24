@@ -92,6 +92,7 @@ class KhulaApp(App):
             print(f"Selected: {button.text}")
 
     def show_dashboard(self):
+        self.dashboard.refresh_statistics()
         self.manager.current = "dashboard"
 
 
