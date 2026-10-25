@@ -1,8 +1,12 @@
 # Khula — Empowering Township and Rural Entrepreneurs
 
-**Khula** is an offline-first business management application designed to help young founders, township entrepreneurs, and rural businesses manage their daily operations.
+**Khula — Grow Your Business**
 
-Khula means *grow* in isiZulu, reflecting our mission to help small businesses grow through accessible digital tools.
+Khula is an offline-first business management application designed to help young founders, township entrepreneurs, and rural businesses manage their daily operations.
+
+*Khula* means **grow** in isiZulu, reflecting our mission to help small businesses grow through accessible digital tools.
+
+**GitHub Repository:** https://github.com/SimonXaba/Khula
 
 ## The Problem
 
@@ -16,11 +20,14 @@ Many small businesses in underserved communities face challenges such as:
 
 ## Our Solution
 
-Khula provides a simple desktop application that enables entrepreneurs to manage essential business activities without requiring a continuous internet connection.
+Khula provides a simple desktop application that enables entrepreneurs to manage essential business activities without requiring an internet connection.
+
+The current MVP focuses on inventory management, sales tracking, expense recording, business reporting, and offline data persistence.
 
 ## Core Features
 
 ### 1. Business Dashboard
+
 - View total sales revenue.
 - Track business expenses.
 - Monitor estimated balance.
@@ -28,20 +35,23 @@ Khula provides a simple desktop application that enables entrepreneurs to manage
 - Navigate between business management modules.
 
 ### 2. Inventory Management
+
 - Add new products.
 - Update product information.
 - Delete eligible products.
-- Track stock quantities.
+- Track available stock quantities.
 - Validate product prices and quantities.
 
 ### 3. Sales Management
+
 - Record product sales.
 - Calculate transaction totals.
-- Automatically reduce inventory.
+- Automatically reduce inventory quantities.
 - Prevent sales exceeding available stock.
 - View sales history.
 
 ### 4. Expense Management
+
 - Record business expenses.
 - Categorize expenses.
 - View expense history.
@@ -49,16 +59,18 @@ Khula provides a simple desktop application that enables entrepreneurs to manage
 - Monitor total spending.
 
 ### 5. Business Reports
+
 - Total sales revenue.
 - Number of sales transactions.
 - Total business expenses.
-- Expense transaction count.
+- Number of expense transactions.
 - Estimated balance.
 - Inventory value at selling prices.
 - Product count.
 - Available stock units.
 
 ### 6. Offline Functionality
+
 - Operates without an internet connection.
 - Stores business information locally using SQLite.
 - Preserves records after application restarts.
@@ -69,12 +81,29 @@ Khula provides a simple desktop application that enables entrepreneurs to manage
 
 | Component | Technology |
 |---|---|
-| Programming language | Python |
-| User interface | Kivy |
+| Programming Language | Python 3.13 |
+| User Interface | Kivy 2.3.1 |
 | Database | SQLite |
-| Development environment | Visual Studio Code |
-| Version control | Git and GitHub |
-| Target platform | Desktop (Windows development environment) |
+| Executable Packaging | PyInstaller |
+| Development Environment | Visual Studio Code |
+| Version Control | Git and GitHub |
+| Target Platform | Windows Desktop |
+
+## Technical Architecture
+
+Khula follows a layered architecture:
+
+**Presentation Layer:** Kivy screens provide the dashboard, inventory, sales, expenses, and reports interfaces.
+
+**Business Logic Layer:** Python service modules manage validation, business operations, calculations, and transactions.
+
+**Data Layer:** SQLite provides persistent local storage for products, sales, and expenses.
+
+**Data Flow:**
+
+User → Kivy Interface → Python Services → SQLite Database
+
+All core business operations are performed locally without requiring a server or internet connection.
 
 ## Project Structure
 
@@ -103,43 +132,91 @@ Khula/
 
 ## Installation and Setup
 
-### Prerequisites
+### Option 1: Run the Windows Executable (Recommended for Judges)
 
-- Python 3.13 or a compatible Python version.
+The Windows executable is provided separately as part of the hackathon submission.
+
+**Requirements:**
+
+- Windows 10 or Windows 11.
+- No separate Python installation required.
+- No internet connection required for core functionality.
+
+**Instructions:**
+
+1. Download `Khula_Windows_Build.zip` from the hackathon submission.
+2. Extract the ZIP file.
+3. Open the extracted `Khula` folder.
+4. Double-click `Khula.exe`.
+5. The application will open to the Khula Dashboard.
+
+**Demo Account Details:**
+
+- Username: Not required.
+- Password: Not required.
+- Authentication: Not implemented in the current MVP.
+
+The executable automatically creates a local SQLite database when first launched.
+
+**Windows Database Location:**
+
+```text
+%LOCALAPPDATA%\Khula\khula.db
+```
+
+Business records remain available after closing and reopening the application.
+
+**Important:** Keep the executable and its supporting files together in the extracted folder.
+
+### Option 2: Run from Source Code
+
+**Prerequisites:**
+
+- Python 3.13.
 - pip.
 - Git (optional).
 
-### Installation
+**Step 1 — Clone the repository**
 
-1. Clone the repository:
+```powershell
+git clone https://github.com/SimonXaba/Khula.git
+```
 
-   `git clone YOUR_REPOSITORY_URL`
+**Step 2 — Navigate to the project**
 
-2. Navigate to the project folder:
+```powershell
+cd Khula
+```
 
-   `cd Khula`
+**Step 3 — Create a virtual environment**
 
-3. Create a virtual environment:
+```powershell
+python -m venv .venv
+```
 
-   `python -m venv .venv`
+**Step 4 — Activate the virtual environment (Windows PowerShell)**
 
-4. Activate it in Windows PowerShell:
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
 
-   `.\.venv\Scripts\Activate.ps1`
+**Step 5 — Install Kivy**
 
-5. Install Kivy:
+```powershell
+python -m pip install Kivy==2.3.1
+```
 
-   `python -m pip install kivy==2.3.1`
+**Step 6 — Launch Khula**
 
-6. Launch Khula:
+```powershell
+python main.py
+```
 
-   `python main.py`
-
-The application initializes its SQLite database locally.
+When running from source, Khula initializes its SQLite database locally in the `database` directory.
 
 ## Security and Data Integrity
 
-Khula includes several safeguards:
+Khula implements the following safeguards:
 
 - Parameterized SQL queries to reduce SQL injection risks.
 - Input validation for product prices, quantities, and expense amounts.
@@ -149,34 +226,60 @@ Khula includes several safeguards:
 - Stock availability checks.
 - Transaction rollback handling for supported database failures.
 
-**Security scope:** This is a hackathon MVP. It does not currently provide user authentication, encrypted local storage, or cloud-based backup.
+**Security Scope:** Khula is a hackathon MVP. It does not currently provide user authentication, encrypted local storage, or cloud-based backup.
 
-## Testing
+## Testing and Quality Assurance
 
 The following checks were completed successfully:
 
-| Test category | Passed |
-|---|---:|
-| Database constraints | 4/4 |
-| Sales transaction security | 9/9 |
-| Inventory security | 12/12 |
-| Expense security | 13/13 |
-| Inventory interface | 3/3 |
-| Expense interface | 3/3 |
-| End-to-end workflow | 6/6 |
+| Test Category | Passed |
+|---|---|
+| Database Constraints | 4/4 |
+| Sales Transaction Security | 9/9 |
+| Inventory Security | 12/12 |
+| Expense Security | 13/13 |
+| Inventory Interface | 3/3 |
+| Expense Interface | 3/3 |
+| End-to-End Workflow | 6/6 |
+| **Total** | **50/50** |
 
-**Total: 50/50 checks passed.**
+Additional offline functionality and data persistence tests were completed successfully.
 
-Additional offline functionality and local data persistence tests were also completed successfully.
+### Windows Executable Verification
+
+The packaged executable also passed six final checks:
+
+1. Inventory records can be created.
+2. Sales transactions correctly reduce available stock.
+3. Business expenses can be recorded.
+4. Dashboard and reports reflect transactions.
+5. Data remains available after restarting the executable.
+6. The persistent SQLite database is created in the Windows application-data directory.
 
 ### Run Automated Tests
 
-text
+From the project root, execute the following commands separately:
+
+```powershell
 python test_database_security.py
 python test_sales_security.py
 python test_inventory_security.py
 python test_expense_security.py
+```
 
+## Example User Journey
+
+Consider a small township entrepreneur selling bread and everyday essentials.
+
+1. **Start:** Open Khula without an internet connection.
+2. **Inventory:** Add products, selling prices, and available stock.
+3. **Sales:** Record a customer purchase.
+4. **Stock Update:** Khula automatically reduces the available stock.
+5. **Expenses:** Record a transport or operating expense.
+6. **Reports:** Review sales revenue, expenses, and estimated balance.
+7. **Persistence:** Close and reopen Khula without losing recorded information.
+
+This workflow demonstrates how Khula supports everyday business recordkeeping.
 
 ## Current Limitations
 
@@ -184,7 +287,8 @@ python test_expense_security.py
 - No online payment processing.
 - No user authentication.
 - No supplier or marketplace integration.
-- Inventory valuation is based on selling prices, not acquisition costs.
+- No mobile application build.
+- Inventory valuation uses selling prices rather than acquisition costs.
 - Estimated balance represents sales revenue minus recorded expenses, not formal accounting profit.
 
 ## Future Improvements
@@ -200,14 +304,23 @@ python test_expense_security.py
 
 ## Hackathon Challenge
 
-**Problem Statement #3:** How might digital tools help young founders and township/rural businesses start, trade, get paid, manage cash flow, and reach formal markets?
+**Problem Statement #3**
+
+*How might digital tools help young founders and township/rural businesses start, trade, get paid, manage cash flow, and reach formal markets?*
 
 Khula addresses the business management and cash-flow visibility aspects of this challenge through an accessible, offline-first solution.
 
 ## Project Status
 
-**Functional hackathon MVP — core features implemented and tested.**
+**Functional Hackathon MVP — Core Features Implemented and Tested**
 
-Built with Python, Kivy, and SQLite.
+- Desktop application developed.
+- Core business modules implemented.
+- Offline SQLite persistence verified.
+- Automated security tests passed.
+- Windows executable successfully built.
+- Final executable functionality verified.
+
+**GitHub:** https://github.com/SimonXaba/Khula
 
 **Khula — Grow Your Business.**
