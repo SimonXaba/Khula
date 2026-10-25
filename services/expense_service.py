@@ -6,7 +6,13 @@ from database.db import get_connection
 
 
 def add_expense(description, amount, category):
-    """Save a new business expense."""
+    """Validate and save a business expense."""
+
+    if not isinstance(description, str):
+        raise ValueError("Expense description must be text.")
+
+    if not isinstance(category, str):
+        raise ValueError("Expense category must be text.")
 
     description = description.strip()
     category = category.strip()
@@ -19,13 +25,20 @@ def add_expense(description, amount, category):
 
     try:
         amount = float(amount)
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, OverflowError):
         raise ValueError("Please enter a valid amount.")
 
     if not math.isfinite(amount) or amount <= 0:
-        raise ValueError("Expense amount must be greater than zero.")
+        raise ValueError(
+            "Expense amount must be greater than zero."
+        )
 
     amount = round(amount, 2)
+
+    if amount <= 0:
+        raise ValueError(
+            "Expense amount must be at least R0.01."
+        )
 
     connection = get_connection()
 
@@ -42,8 +55,11 @@ def add_expense(description, amount, category):
         """, (description, amount, category))
 
         connection.commit()
-
         return cursor.lastrowid
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
 
     finally:
         connection.close()
@@ -92,8 +108,11 @@ def delete_expense(expense_id):
         """, (expense_id,))
 
         connection.commit()
-
         return cursor.rowcount > 0
+
+    except sqlite3.Error:
+        connection.rollback()
+        raise
 
     finally:
         connection.close()

@@ -1,23 +1,70 @@
 
 import sqlite3
+import math
+
 from database.db import get_connection
 
 
-def add_product(name, price, quantity):
-    """Add a new product to the inventory."""
+# -----------------------------------------
+# INPUT VALIDATION
+# -----------------------------------------
+
+def validate_product(name, price, quantity):
+    """Validate and normalize inventory inputs."""
+
+    if not isinstance(name, str):
+        raise ValueError("Product name must be text.")
 
     name = name.strip()
-    price = round(float(price), 2)
-    quantity = int(quantity)
 
     if not name:
         raise ValueError("Product name cannot be empty.")
 
+    try:
+        price = float(price)
+    except (ValueError, TypeError, OverflowError):
+        raise ValueError("Please enter a valid price.")
+
+    if not math.isfinite(price):
+        raise ValueError("Price must be a finite number.")
+
     if price < 0:
         raise ValueError("Price cannot be negative.")
 
-    if quantity < 0:
+    price = round(price, 2)
+
+    if isinstance(quantity, bool):
+        raise ValueError("Quantity must be a whole number.")
+
+    try:
+        quantity_value = float(quantity)
+    except (ValueError, TypeError, OverflowError):
+        raise ValueError("Quantity must be a whole number.")
+
+    if not math.isfinite(quantity_value):
+        raise ValueError("Quantity must be a finite number.")
+
+    if not quantity_value.is_integer():
+        raise ValueError("Quantity must be a whole number.")
+
+    if quantity_value < 0:
         raise ValueError("Quantity cannot be negative.")
+
+    quantity = int(quantity_value)
+
+    return name, price, quantity
+
+
+# -----------------------------------------
+# ADD PRODUCT
+# -----------------------------------------
+
+def add_product(name, price, quantity):
+    """Add a validated product to inventory."""
+
+    name, price, quantity = validate_product(
+        name, price, quantity
+    )
 
     connection = get_connection()
 
@@ -40,6 +87,10 @@ def add_product(name, price, quantity):
         connection.close()
 
 
+# -----------------------------------------
+# GET ALL PRODUCTS
+# -----------------------------------------
+
 def get_all_products():
     """Retrieve all inventory products."""
 
@@ -61,20 +112,16 @@ def get_all_products():
         connection.close()
 
 
+# -----------------------------------------
+# UPDATE PRODUCT
+# -----------------------------------------
+
 def update_product(product_id, name, price, quantity):
     """Update an existing product."""
 
-    name = name.strip()
-    price = round(float(price), 2)
-    quantity = int(quantity)
-
-    if not name:
-        raise ValueError("Product name cannot be empty.")
-
-    if price < 0 or quantity < 0:
-        raise ValueError(
-            "Price and quantity cannot be negative."
-        )
+    name, price, quantity = validate_product(
+        name, price, quantity
+    )
 
     connection = get_connection()
 
@@ -98,8 +145,12 @@ def update_product(product_id, name, price, quantity):
         connection.close()
 
 
+# -----------------------------------------
+# DELETE PRODUCT
+# -----------------------------------------
+
 def delete_product(product_id):
-    """Delete a product if it is not referenced by sales."""
+    """Delete a product unless referenced by sales."""
 
     connection = get_connection()
 
@@ -129,8 +180,12 @@ def delete_product(product_id):
         connection.close()
 
 
+# -----------------------------------------
+# INVENTORY SUMMARY
+# -----------------------------------------
+
 def get_inventory_summary():
-    """Return the total products and available stock."""
+    """Return total products and available stock."""
 
     connection = get_connection()
 
